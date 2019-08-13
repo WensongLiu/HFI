@@ -1,0 +1,19 @@
+#root_header{
+    padding-top: 15%;
+    padding-right: 33%;
+    padding-left: 33%;
+}
+
+#login_form{
+    padding-top: 0%;
+    padding-right: 42%;
+    padding-left: 42%;
+}
+
+#login_form input{
+    width:150px;
+}
+
+#login_form button{
+    width:150px;
+}

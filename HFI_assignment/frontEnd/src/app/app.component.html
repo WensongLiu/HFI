@@ -1,0 +1,31 @@
+<div id='root_container'>
+  <div id='root_header'>
+    <h1>
+      Welcome to HFI Reporting System!
+    </h1>
+  </div>
+  <div id='login_form'>
+    <form [formGroup]="loginInfoForm" class="form">
+        <br />
+        <br />
+        <div>
+            <input type="number" formControlName="memberID" name="memberID" placeholder="Member ID" class="enter" />
+        </div>
+        <br />
+        <br />
+        <div>
+            <input type="text" formControlName="fullName" name="fullName" placeholder="Full Name" class="enter" />
+        </div>
+        <br />
+        <br />
+        <br />
+        <div>
+            <button type="submit" (click)="onLogin()" name="loginBtn" class="enter">Log In</button>
+        </div>
+        <br />
+        <br />
+    </form>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

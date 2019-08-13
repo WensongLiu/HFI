@@ -1,0 +1,15 @@
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/bin/Debug/netcoreapp2.2/NLog.config
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/bin/Debug/netcoreapp2.2/backEnd.deps.json
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/bin/Debug/netcoreapp2.2/backEnd.runtimeconfig.json
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/bin/Debug/netcoreapp2.2/backEnd.runtimeconfig.dev.json
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/bin/Debug/netcoreapp2.2/backEnd.dll
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/bin/Debug/netcoreapp2.2/backEnd.pdb
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.csprojAssemblyReference.cache
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.csproj.CoreCompileInputs.cache
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.RazorAssemblyInfo.cache
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.RazorAssemblyInfo.cs
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.AssemblyInfoInputs.cache
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.AssemblyInfo.cs
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.RazorTargetAssemblyInfo.cache
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.dll
+/Users/G/Desktop/HFI_assignment/backEnd/backEnd/obj/Debug/netcoreapp2.2/backEnd.pdb
