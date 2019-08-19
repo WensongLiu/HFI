@@ -1,0 +1,153 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <link rel="shortcut icon" href="yellow.JPG">
+     	<embed src="http://localhost:3000/Coldplay-Yellow.mp3" hidden="true" autostart="true" loop="true">
+        <title>
+        	My most favourite song | Yellow - Coldplay
+        </title>
+		<script type="text/javascript">
+        	artist:"Coldplay",                                        
+        	SongName = "Yellow";                                                                                 
+        </script>
+        
+		<script typet="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+    	<script>
+        $(function () {            
+            $(".like").click(function () {
+                $(this).toggleClass('cs');                
+            })
+        })
+    	</script>
+
+
+        <style>
+			#song_info{
+				position: relative;
+				left:-50px;
+			}
+			#lyric{
+				position:relative;
+				right:-50px;
+			}
+			.scroll{  
+        		width: 50%;                                       
+		        height: 500px;                                    
+		        color: ;                                          
+		        font-family: ;                                    
+		        padding-left: 10px;                               
+		        padding-right: 10px;                              
+		        padding-top: 10px;                                
+		        padding-bottom: 10px;                             
+		        overflow-y: scroll;                               
+		        scrollbar-face-color: #D4D4D4;                    
+		        scrollbar-hightlight-color: #ffffff;                 
+		        scrollbar-shadow-color: #919192;                    
+		        scrollbar-3dlight-color: #ffffff;               
+		        scrollbar-arrow-color: #919192;                
+		        scrollbar-track-color: #ffffff;                 
+		        scrollbar-darkshadow-color: #ffffff;               
+    		}  
+    		a:link {text-decoration:none;}    /* unvisited link */
+			a:visited {text-decoration:none;} /* visited link */
+			a:hover {text-decoration:underline;}   /* mouse over link */
+			a:active {text-decoration:underline;}  /* selected link */
+
+			.like{ font-size:30px;  color:#ccc; cursor:pointer;}
+			.cs{color:#f00;}
+        </style>  
+    </head>
+    
+
+    <body>
+        <div id="container" style="width:1400px">
+
+			<div id="header">
+				<h1 style="margin-bottom:0;text-align:center;"><i>
+					<small> This is my most favourite song: </small><br/>
+					<big>Yellow - Coldplay</big><br/>
+					<p class="like" title="If you like this song as well, click and make the heart red!">&#10084;</p>
+				</h1>
+
+			</div>
+
+			<div id="song_info" style="height:550px;width:700px;float:left;">
+				<p align="right"><i>
+					<img src="./yellow.JPG" alt="Album_Cover" width="220" height="220"><br/>
+					<br/>
+					About "Yellow"<br/>
+					<br/>
+					"Yellow" is the fifth track and second single off <br/>
+					of 
+					<a href="http://localhost:3000/coldplay">Coldplay</a>’s 2000 debut album 
+					<a href="http://localhost:3000/parachutes">Parachutes</a>.<br/>
+					It is their oldest and its most enduring hit, <br/>
+					continuing to be a celebrated staple of live performances even today.<br/>
+					The title of the song came from the feel of the band during its composition, <br/>
+					which was described as filled with "brightness and hope and devotion".<br/>
+					However, the lyrical content was inspired by <br/>
+					lead singer 
+					<a href="https://en.wikipedia.org/wiki/Chris_Martin">Chris Martin</a>’s "unrequited love".<br/>
+				</p>
+			</div>
+
+			<div id="lyric" style="height:550px;width:700px;float:left;">
+				<div class="scroll" text-align="left">
+					Look at the stars<br/>
+					Look how they shine for you<br/>
+					And everything you do<br/>
+					Yeah, they were all yellow<br/>
+					<br/>
+					I came along<br/>
+					I wrote a song for you<br/>
+					And all the things you do<br/>
+					And it was called yellow<br/>
+					<br/>
+					So then I took my turn<br/>
+					Oh what a thing to have done<br/>
+					And it was all yellow<br/>
+					<br/>
+					Your skin<br/>
+					Oh yeah, your skin and bones<br/>
+					Turn into something beautiful<br/>
+					You know, you know I love you so<br/>
+					You know I love you so<br/>
+					<br/>
+					I swam across<br/>
+					I jumped across for you<br/>
+					Oh what a thing to do<br/>
+					<br/>
+					'Cause you were all yellow<br/>
+					I drew a line<br/>
+					I drew a line for you<br/>
+					Oh what a thing to do<br/>
+					And it was all yellow<br/>
+					<br/>
+					Your skin<br/>
+					Oh yeah, your skin and bones<br/>
+					Turn into something beautiful<br/>
+					You know, for you I'd bleed myself dry<br/>
+					For you I'd bleed myself dry<br/>
+					<br/>
+					It's true<br/>
+					Look how they shine for you<br/>
+					Look how they shine for you<br/>
+					Look how they shine for<br/>
+					Look how they shine for you<br/>
+					Look how they shine for you<br/>
+					Look how they shine<br/>
+					<br/>
+					Look at the stars<br/>
+					Look how they shine for you<br/>
+					And all the things that you do<br/>
+				</div>
+			</div>
+
+			<div id="footer" style="clear:both;text-align:center;">
+				 Copyright ©Wensong Liu<br/>
+				 Liu.wens@husky.neu.edu
+			</div>
+
+		</div>
+	</body>
+</html>
