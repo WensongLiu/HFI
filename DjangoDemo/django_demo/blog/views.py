@@ -10,4 +10,8 @@ def home(request):
     return HttpResponse(html)
 
 def yellow(request):
-    return render(request,'yellow.html')
+    return render(request,'yellow.html', {}, status = "200")
+
+def welcomePage(request):
+    now = datetime.datetime.now()
+    return render(request,'welcome.html', {'time': 'now'}, status = '200')
