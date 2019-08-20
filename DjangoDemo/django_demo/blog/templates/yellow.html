@@ -1,8 +1,10 @@
+{% load staticfiles %}
+
 <!doctype html>
 <html class="no-js" lang="">
     <head>
-        <link rel="shortcut icon" href="yellow.JPG">
-     	<embed src="http://localhost:3000/Coldplay-Yellow.mp3" hidden="true" autostart="true" loop="true">
+        <link rel="shortcut icon" href="{% static "../static/yellow.JPG" %}">
+     	<embed src="{% static "../static/Coldplay-Yellow.mp3" %}" hidden="true" autostart="true" loop="true" type="audio/mpeg">
         <title>
         	My most favourite song | Yellow - Coldplay
         </title>
@@ -73,7 +75,7 @@
 
 			<div id="song_info" style="height:550px;width:700px;float:left;">
 				<p align="right"><i>
-					<img src="./yellow.JPG" alt="Album_Cover" width="220" height="220"><br/>
+					<img src="{% static "../static/yellow.JPG" %}" alt="Album_Cover" width="220" height="220"><br/>
 					<br/>
 					About "Yellow"<br/>
 					<br/>
