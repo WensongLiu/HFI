@@ -14,4 +14,4 @@ def yellow(request):
 
 def welcomePage(request):
     now = datetime.datetime.now()
-    return render(request,'welcome.html', {'time': 'now'}, status = '200')
+    return render(request,'welcome.html', {'time': now}, status = '200')
