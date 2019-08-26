@@ -1,0 +1,21 @@
+{% load humanize %}
+
+<html>
+	<body>
+		<form action="signUp" method="post">
+		{% csrf_token %}
+			<label for="email" class="col-sm-4 control-label">Email*:</label>
+	          <div>
+	            {{form.email}}
+	          </div>
+	        <label for="pssword" class="col-sm-4 control-label">Password*:</label>
+              <div class="col-sm-5">
+                {{form.password}}
+              </div>
+            <label for="pssword2" class="col-sm-4 control-label">Re-password*:</label>
+              <div class="col-sm-5">
+                {{form.confirm_password}}
+              </div>
+		</form>
+	</body>
+</html>
