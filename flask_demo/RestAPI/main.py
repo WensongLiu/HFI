@@ -37,9 +37,9 @@ def add_user():
         
 @app.route('/users')
 def users():
+    conn = mysql.connect()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
     try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute("SELECT * FROM tbl_user")
         rows = cursor.fetchall()
         resp = jsonify(rows)
@@ -51,7 +51,7 @@ def users():
         cursor.close() 
         conn.close()
         
-@app.route('/user/')
+@app.route('/user/<int:id>')
 def user(id):
     try:
         conn = mysql.connect()
@@ -97,14 +97,14 @@ def update_user():
         cursor.close() 
         conn.close()
         
-@app.route('/delete/')
+@app.route('/delete/<int:id>')
 def delete_user(id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM tbl_user WHERE user_id=%s", (id,))
         conn.commit()
-        resp = jsonify('User deleted successfully!')
+        resp = jsonify('User has beed deleted successfully!')
         resp.status_code = 200
         return resp
     except Exception as e:
