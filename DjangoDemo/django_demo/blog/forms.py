@@ -1,4 +1,5 @@
 from django import forms
+from blog.models import Users
 from django.conf import settings
 
 # Create your forms here.
@@ -11,3 +12,11 @@ class SignupForm (forms.Form):
     confirm_password= forms.CharField(error_messages={'required': 'This field is required!'},
         label='Re-password',required=True,max_length=20,min_length=6,widget = forms.PasswordInput(attrs={'placeholder':'Please type in your password again!'}))
     
+    class Meta:
+        model = Users
+        fields = ['userID', 'emailAddress', 'password']
+
+    def getEmail(self):
+        breakpoint()
+        print(self.email)
+        return self.email
