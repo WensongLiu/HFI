@@ -2,12 +2,12 @@ import pymysql
 from app import app
 from db_config import mysql
 from flask import jsonify
-from flask import flash, request
+from flask import Flask, request, make_response
 from werkzeug import generate_password_hash, check_password_hash
-        
+
 @app.route('/add', methods=['POST'])
 def add_user():
-    conn = mysql.connect()
+    conn = mysql.connect() 
     cursor = conn.cursor()
     try:
         _json = request.json
@@ -40,7 +40,7 @@ def users():
     conn = mysql.connect()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     try:
-        cursor.execute("SELECT * FROM tbl_user")
+        cursor.callproc("test_procedure")
         rows = cursor.fetchall()
         resp = jsonify(rows)
         resp.status_code = 200
@@ -56,11 +56,21 @@ def user(id):
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM tbl_user WHERE user_id=%s", id)
+        args = [ id ]
+        cursor.callproc("test_procedure_ID", args)
         row = cursor.fetchone()
-        resp = jsonify(row)
-        resp.status_code = 200
-        return resp
+        if row:
+            resp = jsonify(row)
+            resp.status_code = 200
+            return resp
+        else:
+            message = {
+                'status': 404,
+                'message': 'User with this userID Not Found! ',
+            }
+            resp = jsonify(message)
+            resp.status_code = 404
+            return resp
     except Exception as e:
         print(e)
     finally:
@@ -123,9 +133,18 @@ def not_found(error=None):
     resp.status_code = 404
 
     return resp
+
+@app.route('/login')
+def login():
+    auth = request.authorization
+
+    if auth and auth.password == "test_password":
+        return 'Login successed!'
+    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required!"'})
         
+# flask run --cert=adhoc
 if __name__ == "__main__":
-    app.run()
+    app.run(debug = True, ssl_context = 'adhoc')
 
 
 
