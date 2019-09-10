@@ -46,7 +46,7 @@
 //                string connString = "SERVER=db4hfi.mysql.database.azure.com" + ";" +
 //                                    "DATABASE=dataset_hfi;" +
 //                                    "UID=Wensong_Liu@db4hfi;" +
-//                                    "PASSWORD=712918.Lwslbs;";
+//                                    "PASSWORD=;";
 //                connection = new MySqlConnection(connString);
 //                connection.Open();
 //            }
