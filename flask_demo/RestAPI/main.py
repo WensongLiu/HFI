@@ -13,8 +13,6 @@ from werkzeug import generate_password_hash, check_password_hash
 ###############################
 app.config['SECRET_KEY'] = 'HFI_client$.r3porting_APP'
 
-
-
 # This route is to test if project works successfully.
 # @app.route('/', methods = ['GET'])
 # def homepage():
@@ -25,11 +23,41 @@ app.config['SECRET_KEY'] = 'HFI_client$.r3porting_APP'
 ########################
 # To define all routers;
 ########################
+@app.route('/users', methods = ['GET'])
+def get_all_users():
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # print('select all users query begins')
+        cursor.execute('SELECT * FROM users')
+        conn.commit()
+        rows = cursor.fetchall()
+        resp = jsonify(rows)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        resp = jsonify(str(e))
+        resp.status_code = 400
+        return resp
+    # close the database connection
+    finally:
+        cursor.close()
+        conn.close()
+
+
 @app.route('/signin', methods = ['POST'])
 def signin():
-    return ''
+    try:
+        return ''
+    except Exception as e:
+        resp = jsonify(str(e))
+        resp.status_code = 400
+        return resp
+    # close the database connection
+    finally:
+        cursor.close()
+        conn.close()
 
-# Route for sign up the new user with data validation
 @app.route('/signup', methods = ['POST'])
 def signup():
     try:
@@ -97,12 +125,52 @@ def signup():
         return resp
     # close the database connection
     finally:
-        cursor.close() 
+        cursor.close()
         conn.close()
 
-@app.route('/update/<public_user_ID>')
+@app.route('/update/<public_user_ID>', methods = ['PUT'])
 def update_user(public_user_ID):
-    return ''
+    try:
+        return ''
+    except Exception as e:
+        resp = jsonify(str(e))
+        resp.status_code = 400
+        return resp
+    # close the database connection
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/delete/<public_user_ID>', methods = ['DELETE'])
+def delete_user(public_user_ID):
+    try:
+        # To connect with MySQL server
+        # print('MySQL connecting......')
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # print('select query begins')
+        cursor.execute('SELECT * FROM users where public_user_ID=%s', (public_user_ID,))
+        conn.commit()
+        rows = cursor.fetchall()
+        if(len(rows) == 0):
+            resp = jsonify('User does not exist!')
+            resp.status_code = 400
+            return resp
+        else:
+            # print('delete query begins')
+            cursor.execute('DELETE FROM users WHERE public_user_ID=%s', (public_user_ID,))
+            conn.commit()
+            resp = jsonify('User selected has been deleted!')
+            resp.status_code = 200
+            return resp
+    except Exception as e:
+        resp = jsonify(str(e))
+        resp.status_code = 400
+        return resp
+    # close the database connection
+    finally:
+        cursor.close()
+        conn.close()    
 
 @app.route('/overview/<public_clientID>')
 def get_overview(public_clientID):
