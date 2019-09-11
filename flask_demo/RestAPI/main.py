@@ -6,7 +6,7 @@ from validator import Validator
 from db_config import mysql
 from flask import jsonify
 from flask import Flask, request, make_response
-from werkzeug import generate_password_hash, check_password_hash
+from werkzeug import generate_password_hash
 
 ###############################
 # To define our token's secret;
@@ -23,51 +23,11 @@ app.config['SECRET_KEY'] = 'HFI_client$.r3porting_APP'
 ########################
 # To define all routers;
 ########################
-@app.route('/users', methods = ['GET'])
-def get_all_users():
-    try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        # print('select all users query begins')
-        cursor.execute('SELECT * FROM users')
-        conn.commit()
-        rows = cursor.fetchall()
-        resp = jsonify(rows)
-        resp.status_code = 200
-        return resp
-    except Exception as e:
-        resp = jsonify(str(e))
-        resp.status_code = 400
-        return resp
-    # close the database connection
-    finally:
-        cursor.close()
-        conn.close()
-
-
-@app.route('/signin', methods = ['POST'])
-def signin():
-    try:
-        return ''
-    except Exception as e:
-        resp = jsonify(str(e))
-        resp.status_code = 400
-        return resp
-    # close the database connection
-    finally:
-        cursor.close()
-        conn.close()
-
 @app.route('/signup', methods = ['POST'])
 def signup():
     try:
-        # To connect with MySQL server
-        # print('MySQL connecting......')
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
         # To get json data from web request
         data = request.get_json()
-
         # To check if there are filled data for signup
         # if there are one or more data fields are missing
         # will return a 400 response, or go on checking
@@ -76,16 +36,18 @@ def signup():
             resp = jsonify('Some fields of signup data are missing, please retry!')
             resp.status_code = 400
             return resp
-
+        # To connect with MySQL server
+        # print('MySQL connecting......')
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         # Give a flag to check the username
         # if flag's status code equals 200, go on checking
         # or it will return flag back as response
         # print('Username checking......')
-        flag_is_Username_Valid = Validator.is_Username_Valid(data['user_name'])
+        flag_is_Username_Valid = Validator.is_Username_Valid(data['user_name'], conn, cursor)
         # print(flag_is_Username_Valid)
         if(flag_is_Username_Valid.status_code != 200):
             return flag_is_Username_Valid
-
         # Give a flag to check the password
         # if flag's status code equals 200, go on checking
         # or it will return flag back as response
@@ -93,7 +55,6 @@ def signup():
         flag_is_Password_Valid = Validator.is_Password_Valid(data['user_password'])
         if(flag_is_Password_Valid.status_code != 200):
             return flag_is_Password_Valid
-
         # To check if password and the confirmation password are equal
         # if not, return a bad response 
         # or all check done, go on creating this new user
@@ -103,8 +64,8 @@ def signup():
             resp.status_code = 400
             return resp
         else:
-        # To create new user in database
-        # if success, give a 201 created response back
+            # To create new user in database
+            # if success, give a 201 created response back
             # print('New user creating......')
             # To encode the client_ID and password by using hash function
             hash_client_ID = generate_password_hash(data['client_ID'], method = 'sha256')
@@ -128,10 +89,75 @@ def signup():
         cursor.close()
         conn.close()
 
+@app.route('/users', methods = ['GET'])
+def get_all_users():
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # print('Select all users query begins.....')
+        cursor.execute('SELECT * FROM users')
+        conn.commit()
+        rows = cursor.fetchall()
+        resp = jsonify(rows)
+        resp.status_code = 200
+        return resp
+    except Exception as e:
+        resp = jsonify(str(e))
+        resp.status_code = 400
+        return resp
+    # close the database connection
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route('/signin', methods = ['POST'])
+def signin():
+    try:
+        # To get json data from web request
+        data = request.get_json()
+        if not (data['user_name'] and data['user_password']):
+            resp = jsonify('These 2 fields are all required, please try again!')
+            resp.status_code = 400
+            return resp
+        # To connect with MySQL server
+        # print('MySQL connecting......')
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # To call validator to check signin info is valid
+        flag_is_Signin_Valid = Validator.is_Signin_Valid(data['user_name'], data['user_password'], conn, cursor)
+        return flag_is_Signin_Valid
+    except Exception as e:
+        resp = jsonify(str(e))
+        resp.status_code = 400
+        return resp
+    # close the database connection
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/update/<public_user_ID>', methods = ['PUT'])
 def update_user(public_user_ID):
     try:
-        return ''
+        # To connect with MySQL server
+        # print('MySQL connecting......')
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # print('Select query begins.....')
+        cursor.execute('SELECT * FROM users where public_user_ID=%s', (public_user_ID,))
+        conn.commit()
+        rows = cursor.fetchall()
+        if(len(rows) == 0):
+            resp = jsonify('User does not exist!')
+            resp.status_code = 400
+            return resp
+        else:
+            # print('Update query begins.......')
+            cursor.execute('UPDATE users SET admin=1 WHERE public_user_ID=%s', (public_user_ID,))
+            conn.commit()
+            resp = jsonify('User selected has been updated as an administrator!')
+            resp.status_code = 200
+            return resp
     except Exception as e:
         resp = jsonify(str(e))
         resp.status_code = 400
@@ -148,7 +174,7 @@ def delete_user(public_user_ID):
         # print('MySQL connecting......')
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        # print('select query begins')
+        # print('Select query begins.......')
         cursor.execute('SELECT * FROM users where public_user_ID=%s', (public_user_ID,))
         conn.commit()
         rows = cursor.fetchall()
@@ -157,7 +183,7 @@ def delete_user(public_user_ID):
             resp.status_code = 400
             return resp
         else:
-            # print('delete query begins')
+            # print('Delete query begins.......')
             cursor.execute('DELETE FROM users WHERE public_user_ID=%s', (public_user_ID,))
             conn.commit()
             resp = jsonify('User selected has been deleted!')
@@ -207,25 +233,6 @@ def get_pending(public_clientID):
 @app.route('/referrals/<public_clientID>')
 def get_referrals(public_clientID):
     return ''
-    # try:
-    #     print("Connection begins!")
-    #     conn = mysql.connect()
-    #     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    #     print("Selection query begins!")
-    #     cursor.execute("select * from address where LINE1 = '31 Sutherland St.'" )
-    #     print("Begin to call procedure!")
-    #     args = [49, "wkly"]
-    #     results = cursor.callproc("cr_standard_outreach", args)
-    #     print(results[0])
-    #     rows = cursor.fetchall()
-    #     resp = jsonify(rows)
-    #     resp.status_code = 200
-    #     return resp
-    # except Exception as e:
-    #     print(e)
-    # finally:
-    #     cursor.close() 
-    #     conn.close()
 
 #######################################################
 # To handle all errors we will encounter in the future; 

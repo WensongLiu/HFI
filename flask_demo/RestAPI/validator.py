@@ -2,11 +2,12 @@ import re
 import pymysql
 from db_config import mysql
 from flask import jsonify
+from werkzeug import check_password_hash
 
 # This class is used to check if the requeest data are valid for signin and signup functions.
 class Validator():
     # function for user name(email address) data validation
-    def is_Username_Valid(user_name):
+    def is_Username_Valid(user_name, conn, cursor):
         # if user name encludes 2 or more '@' or any space
         # will give a 400 bad request response
         # or user name's format is correct, so go on checking
@@ -17,8 +18,6 @@ class Validator():
         # To check if there is an existed account with this user name in database
         # if so, give a 405 Method not allowed response back
         # if not, user name is clear
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute('SELECT * FROM users where user_name=%s', (user_name,))
         conn.commit()
         rows = cursor.fetchall()
@@ -43,7 +42,6 @@ class Validator():
             resp = jsonify('Password is too long!')
             resp.status_code = 400
             return resp
-
         # To check the password's strength
         # it must contain at least 1 number, 1 uppercase, 1 lowercase and 1 special character
         regex_special_characters = re.compile('[,.@_!#$%^&*()<>?/\|}{~:]')
@@ -70,4 +68,37 @@ class Validator():
             resp = jsonify('')
             resp.status_code = 200
             return resp
+
+    # To check if signin info is valid
+    def is_Signin_Valid(user_name, user_password, conn, cursor):
+        # if user name encludes 2 or more '@' or any space
+        # will give a 400 bad request response
+        # or user name's format is correct, so go on checking
+        print("Checking user name......")
+        if not re.match(r'[^@^\s]+@[^@^\s]+\.[^@^\s]+', user_name):
+            resp = jsonify('Illegal characters in your User Name!')
+            resp.status_code = 400
+            return resp
+        # To check if there is an existed account with this user name in database
+        # if so, signin method can go on checking the password
+        # if not, give a bad request response
+        cursor.execute('SELECT * FROM users where user_name=%s', (user_name,))
+        conn.commit()
+        rows = cursor.fetchall()
+        if(len(rows) == 0):
+            resp = jsonify("User doesn't exist! Any question please contact with HFI!")
+            resp.status_code = 400
+            return resp
+        # To check if the signin password is valid
+        elif(not check_password_hash(rows[0].get('user_password'), user_password)):
+            resp = jsonify('Password is incorrect! Any question please contact with HFI!')
+            resp.status_code = 400
+            return resp
+        # if all info checked, return a 200 success response
+        else:
+            resp = jsonify('Sign in successfully!')
+            resp.status_code = 200
+            return resp
+
+
 
