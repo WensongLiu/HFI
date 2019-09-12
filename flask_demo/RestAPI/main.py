@@ -1,6 +1,9 @@
 import pymysql
 import uuid
 import re
+import jwt
+import datetime
+import json
 from app import app
 from validator import Validator
 from db_config import mysql
@@ -11,7 +14,8 @@ from werkzeug import generate_password_hash
 ###############################
 # To define our token's secret;
 ###############################
-app.config['SECRET_KEY'] = 'HFI_client$.r3porting_APP'
+app.config['SECRET_KEY_CLIENT'] = 'demo_HFI_client$.r3porting_APP'
+app.config['SECRET_KEY_ADMIN'] = 'demo_RTYUfghj%^&*(123'
 
 # This route is to test if project works successfully.
 # @app.route('/', methods = ['GET'])
@@ -126,7 +130,19 @@ def signin():
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         # To call validator to check signin info is valid
         flag_is_Signin_Valid = Validator.is_Signin_Valid(data['user_name'], data['user_password'], conn, cursor)
-        return flag_is_Signin_Valid
+        if(flag_is_Signin_Valid.status_code != 200):
+            return flag_is_Signin_Valid
+        else:
+            print(type(flag_is_Signin_Valid.data))
+            print(flag_is_Signin_Valid.data)
+            print(flag_is_Signin_Valid.response[0])
+            return ''
+        # else:
+        #     client_token = jwt.encode({'Public User ID' : flag_is_Signin_Valid[1], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes = 30)}, app.config['SECRET_KEY_CLIENT'])
+        #     resp = jsonify({'token' : client_token.decode('UTF-8')})
+        #     resp.status_code = 209
+        #     print('client')
+        #     return resp
     except Exception as e:
         resp = jsonify(str(e))
         resp.status_code = 400

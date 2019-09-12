@@ -94,11 +94,14 @@ class Validator():
             resp = jsonify('Password is incorrect! Any question please contact with HFI!')
             resp.status_code = 400
             return resp
-        # if all info checked, return a 200 success response
+        # if all info checked, return a request success response
+        # use different success status code to recognize client user and admin user, 200 is for client and 209 is for administrator
+        # ??????????????????????????? Still need to check if admin is boolean value ????????????????????
         else:
-            resp = jsonify('Sign in successfully!')
+            resp = jsonify(public_user_ID=rows[0].get('public_user_ID'))
             resp.status_code = 200
             return resp
+
 
 
 
