@@ -6,16 +6,17 @@ import datetime
 import json
 from app import app
 from validator import Validator
+from user import User
 from db_config import mysql
 from flask import jsonify
 from flask import Flask, request, make_response
 from werkzeug import generate_password_hash
+from functools import wraps
 
 ###############################
 # To define our token's secret;
 ###############################
-app.config['SECRET_KEY_CLIENT'] = 'demo_HFI_client$.r3porting_APP'
-app.config['SECRET_KEY_ADMIN'] = 'demo_RTYUfghj%^&*(123'
+app.config['SECRET_KEY'] = 'demo4_HFI_client$.r3porting_APP'
 
 # This route is to test if project works successfully.
 # @app.route('/', methods = ['GET'])
@@ -27,8 +28,52 @@ app.config['SECRET_KEY_ADMIN'] = 'demo_RTYUfghj%^&*(123'
 ########################
 # To define all routers;
 ########################
+def toker_validation(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        # To check if there is a valided token in the request header
+        # if not, return a 401 response back
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return jsonify('Token is missing!'), 401
+        # Then try to decode the token with secret key
+        # if cant decode successfully, return token is invalid back
+        # if success, get this user info by it's public_user_ID from the request payload
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            # To connect with MySQL server
+            # print('MySQL connecting......')
+            conn = mysql.connect()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            # TO search this user by using it's public_user_ID
+            cursor.execute('SELECT * FROM users where public_user_ID=%s', (data['Public User ID'],))
+            conn.commit()
+            rows = cursor.fetchall()
+            # get all iofo we need in the feture to create a User instance fot current login user
+            _public_user_ID = rows[0]['public_user_ID']
+            _user_name = rows[0]['user_name']
+            _public_client_ID = rows[0]['public_client_ID']
+            if(rows[0]['admin'] == 1):
+                _admin = True
+            else:
+                _admin = False
+            current_user = User(_public_user_ID, _user_name, _public_client_ID, _admin)
+        except:
+            return jsonify('Token is invalid!'), 401
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+
 @app.route('/signup', methods = ['POST'])
-def signup():
+@toker_validation
+def signup(current_user):
+    # Using this current login use's info to check if he/she is an admin user
+    # if not, so this client user can only access methods for client users
+    # if so, this admin user can access all methods
+    if current_user.admin is False:
+        return jsonify("This method isn't available for current user!"), 401
     try:
         # To get json data from web request
         data = request.get_json()
@@ -94,7 +139,13 @@ def signup():
         conn.close()
 
 @app.route('/users', methods = ['GET'])
-def get_all_users():
+@toker_validation
+def get_all_users(current_user):
+    # Using this current login use's info to check if he/she is an admin user
+    # if not, so this client user can only access methods for client users
+    # if so, this admin user can access all methods
+    if current_user.admin is False:
+        return jsonify("This method isn't available for current user!"), 401
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -117,26 +168,31 @@ def get_all_users():
 
 @app.route('/signin', methods = ['POST'])
 def signin():
+    # To connect with MySQL server
+    print('MySQL connecting......')
+    conn = mysql.connect()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
     try:
         # To get json data from web request
+        print('Data catching......')
         data = request.get_json()
         if not (data['user_name'] and data['user_password']):
             resp = jsonify('These 2 fields are all required, please try again!')
             resp.status_code = 400
             return resp
-        # To connect with MySQL server
-        # print('MySQL connecting......')
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        
         # To call validator to check signin info is valid
+        print('Checking user name and password.....')
+        print(data['user_name'])
         flag_is_Signin_Valid = Validator.is_Signin_Valid(data['user_name'], data['user_password'], conn, cursor)
-        if(flag_is_Signin_Valid.status_code != 200):
+        if((not isinstance(flag_is_Signin_Valid, str)) and flag_is_Signin_Valid.status_code != 200):
             return flag_is_Signin_Valid
         else:
-            print(type(flag_is_Signin_Valid.data))
-            print(flag_is_Signin_Valid.data)
-            print(flag_is_Signin_Valid.response[0])
-            return ''
+            print('Token creating.........')
+            token = jwt.encode({'Public User ID' : flag_is_Signin_Valid, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes = 1)}, app.config['SECRET_KEY'])
+            resp = jsonify({'token' : token.decode('UTF-8')})
+            resp.status_code = 200
+            return resp
         # else:
         #     client_token = jwt.encode({'Public User ID' : flag_is_Signin_Valid[1], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes = 30)}, app.config['SECRET_KEY_CLIENT'])
         #     resp = jsonify({'token' : client_token.decode('UTF-8')})
@@ -153,7 +209,13 @@ def signin():
         conn.close()
 
 @app.route('/update/<public_user_ID>', methods = ['PUT'])
-def update_user(public_user_ID):
+@toker_validation
+def update_user(current_user, public_user_ID):
+    # Using this current login use's info to check if he/she is an admin user
+    # if not, so this client user can only access methods for client users
+    # if so, this admin user can access all methods
+    if current_user.admin is False:
+        return jsonify("This method isn't available for current user!"), 401
     try:
         # To connect with MySQL server
         # print('MySQL connecting......')
@@ -184,7 +246,13 @@ def update_user(public_user_ID):
         conn.close()
 
 @app.route('/delete/<public_user_ID>', methods = ['DELETE'])
-def delete_user(public_user_ID):
+@toker_validation
+def delete_user(current_user, public_user_ID):
+    # Using this current login use's info to check if he/she is an admin user
+    # if not, so this client user can only access methods for client users
+    # if so, this admin user can access all methods
+    if current_user.admin is False:
+        return jsonify("This method isn't available for current user!"), 401
     try:
         # To connect with MySQL server
         # print('MySQL connecting......')
@@ -215,39 +283,48 @@ def delete_user(public_user_ID):
         conn.close()    
 
 @app.route('/overview/<public_clientID>')
-def get_overview(public_clientID):
+@toker_validation
+def get_overview(current_user, public_clientID):
     return ''
 
 @app.route('/appeals/<public_clientID>')
-def get_appeals(public_clientID):
+@toker_validation
+def get_appeals(current_user, public_clientID):
     return ''
 
 @app.route('/approvals/<public_clientID>')
-def get_approvals(public_clientID):
+@toker_validation
+def get_approvals(current_user, public_clientID):
     return ''
 
 @app.route('/closed/<public_clientID>')
-def get_closed(public_clientID):
+@toker_validation
+def get_closed(current_user, public_clientID):
     return ''
 
 @app.route('/closed_new/<public_clientID>')
-def get_closed_new(public_clientID):
+@toker_validation
+def get_closed_new(current_user, public_clientID):
     return ''
 
 @app.route('/outreach/<public_clientID>')
-def get_outreach(public_clientID):
+@toker_validation
+def get_outreach(current_user, public_clientID):
     return ''
 
 @app.route('/outreach_new/<public_clientID>')
-def get_outreach_new(public_clientID):
+@toker_validation
+def get_outreach_new(current_user, public_clientID):
     return ''
 
 @app.route('/pending/<public_clientID>')
-def get_pending(public_clientID):
+@toker_validation
+def get_pending(current_user, public_clientID):
     return ''
 
 @app.route('/referrals/<public_clientID>')
-def get_referrals(public_clientID):
+@toker_validation
+def get_referrals(current_user, public_clientID):
     return ''
 
 #######################################################
