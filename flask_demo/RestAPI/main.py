@@ -24,11 +24,9 @@ app.config['SECRET_KEY'] = 'demo4_HFI_client$.r3porting_APP'
 #     resp = jsonify('Hi!')
 #     resp.status_code = 200
 #     return resp
-        
-########################
-# To define all routers;
-########################
-def toker_validation(f):
+
+# Decorator for token validation 
+def token_validation(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
@@ -65,9 +63,11 @@ def toker_validation(f):
         return f(current_user, *args, **kwargs)
     return decorated
 
-
+########################
+# To define all routers;
+########################
 @app.route('/signup', methods = ['POST'])
-@toker_validation
+@token_validation
 def signup(current_user):
     # Using this current login use's info to check if he/she is an admin user
     # if not, so this client user can only access methods for client users
@@ -139,7 +139,7 @@ def signup(current_user):
         conn.close()
 
 @app.route('/users', methods = ['GET'])
-@toker_validation
+@token_validation
 def get_all_users(current_user):
     # Using this current login use's info to check if he/she is an admin user
     # if not, so this client user can only access methods for client users
@@ -169,12 +169,12 @@ def get_all_users(current_user):
 @app.route('/signin', methods = ['POST'])
 def signin():
     # To connect with MySQL server
-    print('MySQL connecting......')
+    # print('MySQL connecting......')
     conn = mysql.connect()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     try:
         # To get json data from web request
-        print('Data catching......')
+        # print('Data catching......')
         data = request.get_json()
         if not (data['user_name'] and data['user_password']):
             resp = jsonify('These 2 fields are all required, please try again!')
@@ -182,23 +182,17 @@ def signin():
             return resp
         
         # To call validator to check signin info is valid
-        print('Checking user name and password.....')
-        print(data['user_name'])
+        # print('Checking user name and password.....')
+        # print(data['user_name'])
         flag_is_Signin_Valid = Validator.is_Signin_Valid(data['user_name'], data['user_password'], conn, cursor)
         if((not isinstance(flag_is_Signin_Valid, str)) and flag_is_Signin_Valid.status_code != 200):
             return flag_is_Signin_Valid
         else:
-            print('Token creating.........')
+            # print('Token creating.........')
             token = jwt.encode({'Public User ID' : flag_is_Signin_Valid, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes = 1)}, app.config['SECRET_KEY'])
             resp = jsonify({'token' : token.decode('UTF-8')})
             resp.status_code = 200
             return resp
-        # else:
-        #     client_token = jwt.encode({'Public User ID' : flag_is_Signin_Valid[1], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes = 30)}, app.config['SECRET_KEY_CLIENT'])
-        #     resp = jsonify({'token' : client_token.decode('UTF-8')})
-        #     resp.status_code = 209
-        #     print('client')
-        #     return resp
     except Exception as e:
         resp = jsonify(str(e))
         resp.status_code = 400
@@ -209,7 +203,7 @@ def signin():
         conn.close()
 
 @app.route('/update/<public_user_ID>', methods = ['PUT'])
-@toker_validation
+@token_validation
 def update_user(current_user, public_user_ID):
     # Using this current login use's info to check if he/she is an admin user
     # if not, so this client user can only access methods for client users
@@ -246,7 +240,7 @@ def update_user(current_user, public_user_ID):
         conn.close()
 
 @app.route('/delete/<public_user_ID>', methods = ['DELETE'])
-@toker_validation
+@token_validation
 def delete_user(current_user, public_user_ID):
     # Using this current login use's info to check if he/she is an admin user
     # if not, so this client user can only access methods for client users
@@ -283,47 +277,47 @@ def delete_user(current_user, public_user_ID):
         conn.close()    
 
 @app.route('/overview/<public_clientID>')
-@toker_validation
+@token_validation
 def get_overview(current_user, public_clientID):
     return ''
 
 @app.route('/appeals/<public_clientID>')
-@toker_validation
+@token_validation
 def get_appeals(current_user, public_clientID):
     return ''
 
 @app.route('/approvals/<public_clientID>')
-@toker_validation
+@token_validation
 def get_approvals(current_user, public_clientID):
     return ''
 
 @app.route('/closed/<public_clientID>')
-@toker_validation
+@token_validation
 def get_closed(current_user, public_clientID):
     return ''
 
 @app.route('/closed_new/<public_clientID>')
-@toker_validation
+@token_validation
 def get_closed_new(current_user, public_clientID):
     return ''
 
 @app.route('/outreach/<public_clientID>')
-@toker_validation
+@token_validation
 def get_outreach(current_user, public_clientID):
     return ''
 
 @app.route('/outreach_new/<public_clientID>')
-@toker_validation
+@token_validation
 def get_outreach_new(current_user, public_clientID):
     return ''
 
 @app.route('/pending/<public_clientID>')
-@toker_validation
+@token_validation
 def get_pending(current_user, public_clientID):
     return ''
 
 @app.route('/referrals/<public_clientID>')
-@toker_validation
+@token_validation
 def get_referrals(current_user, public_clientID):
     return ''
 

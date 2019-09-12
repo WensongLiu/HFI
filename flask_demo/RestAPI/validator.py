@@ -74,7 +74,7 @@ class Validator():
         # if user name encludes 2 or more '@' or any space
         # will give a 400 bad request response
         # or user name's format is correct, so go on checking
-        print("Checking user name......")
+        # print("Checking user name......")
         if not re.match(r'[^@^\s]+@[^@^\s]+\.[^@^\s]+', user_name):
             resp = jsonify('Illegal characters in your User Name!')
             resp.status_code = 400
@@ -82,8 +82,8 @@ class Validator():
         # To check if there is an existed account with this user name in database
         # if so, signin method can go on checking the password
         # if not, give a bad request response
-        print('Searching user......')
-        print(user_name)
+        # print('Searching user......')
+        # print(user_name)
         cursor.execute('SELECT * FROM users where user_name=%s', (user_name,))
         conn.commit()
         rows = cursor.fetchall()
@@ -93,13 +93,11 @@ class Validator():
             return resp
         # To check if the signin password is valid
         elif(not check_password_hash(rows[0].get('user_password'), user_password)):
-            print('Identify password......')
+            # print('Identify password......')
             resp = jsonify('Password is incorrect! Any question please contact with HFI!')
             resp.status_code = 400
             return resp
-        # if all info checked, return a request success response
-        # use different success status code to recognize client user and admin user, 200 is for client and 209 is for administrator
-        # ??????????????????????????? Still need to check if admin is boolean value ????????????????????
+        # if all info checked, return this user's public user ID for token validation
         else:
             resp = rows[0].get('public_user_ID')
             return resp

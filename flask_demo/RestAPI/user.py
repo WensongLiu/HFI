@@ -1,3 +1,4 @@
+# This class is used to store the infos we need for current login user
 class User:
     public_user_ID = ''
     user_name = ''
